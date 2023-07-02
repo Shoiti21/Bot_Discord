@@ -154,7 +154,7 @@ const skip: CommandService = {
       });
 
       // Pular a track
-      queue?.node.skip();
+      queue.node.skip();
 
       // Alterar a Resposta
       await interaction.editReply({
@@ -173,7 +173,33 @@ const pause: CommandService = {
     .setName("pause")
     .setDescription("Pausar a reprodução")
     .toJSON(),
-  service: async (interaction: CommandInteraction) => {},
+  service: async (interaction: CommandInteraction) => {
+    try {
+      if (!interaction.guildId) throw Error("Não foi encontrado o servidor!");
+
+      // Buscar a queue
+      const queue = useQueue(interaction.guildId);
+
+      if (isEmpty(queue)) throw Error("Não tem nenhuma faixa sendo executado!");
+
+      // Pausar o player
+      queue.node.pause();
+
+      // Montagem embed
+      const embed = new EmbedBuilder({
+        description: "**Pausou a reprodução das faixas!**",
+      });
+
+      // Alterar a Resposta
+      await interaction.editReply({
+        embeds: [embed.data],
+      });
+    } catch (error) {
+      await interaction.editReply({
+        content: (error as Error).message,
+      });
+    }
+  },
 };
 
 const resume: CommandService = {
