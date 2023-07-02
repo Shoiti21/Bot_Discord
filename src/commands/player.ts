@@ -101,7 +101,33 @@ const stop: CommandService = {
     .setName("stop")
     .setDescription("Encerrar serviço de player")
     .toJSON(),
-  service: async (interaction: CommandInteraction) => {},
+  service: async (interaction: CommandInteraction) => {
+    try {
+      if (!interaction.guildId) throw Error("Não foi encontrado o servidor!");
+
+      // Buscar a queue
+      const queue = useQueue(interaction.guildId);
+
+      if (isEmpty(queue)) throw Error("Não tem nenhuma faixa sendo executado!");
+
+      // Deletar o player
+      queue.delete();
+
+      // Montagem embed
+      const embed = new EmbedBuilder({
+        description: "**Parou a reprodução das faixas!**",
+      });
+
+      // Alterar a Resposta
+      await interaction.editReply({
+        embeds: [embed.data],
+      });
+    } catch (error) {
+      await interaction.editReply({
+        content: (error as Error).message,
+      });
+    }
+  },
 };
 
 const skip: CommandService = {
@@ -116,14 +142,15 @@ const skip: CommandService = {
       // Buscar a queue
       const queue = useQueue(interaction.guildId);
 
-      if (isEmpty(queue)) throw Error("Não tem nenhuma faixa sendo executado!");
+      if (isEmpty(queue))
+        throw Error("Não tem nenhuma faixa sendo reproduzida!");
 
       // Track atual
       const { currentTrack } = queue;
 
       // Montagem embed
       const embed = new EmbedBuilder({
-        description: `O vídeo [${currentTrack?.title}](${currentTrack?.url}) foi pulado!`,
+        description: `**O vídeo [${currentTrack?.title}](${currentTrack?.url}) foi pulado!**`,
       });
 
       // Pular a track
