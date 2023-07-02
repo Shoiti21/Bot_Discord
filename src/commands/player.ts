@@ -4,7 +4,7 @@ import {
   CommandInteractionOptionResolver,
   GuildMember,
 } from "discord.js";
-import { QueryType, useMainPlayer } from "discord-player";
+import { QueryType, useMainPlayer, useQueue } from "discord-player";
 import { isEmpty } from "lodash";
 import { CommandService } from "../dtos/CommandDTO";
 
@@ -47,7 +47,7 @@ const play: CommandService = {
 
       // Se não encontrar nenhuma track
       if (!searchResult.hasTracks())
-        throw new Error("Não foi encontrado nenhuma track!");
+        throw new Error("Não foi encontrado nenhuma faixa!");
 
       const track = searchResult.tracks[0];
 
@@ -109,7 +109,36 @@ const skip: CommandService = {
     .setName("skip")
     .setDescription("Pular a faixa e coloque a próxima da fila")
     .toJSON(),
-  service: async (interaction: CommandInteraction) => {},
+  service: async (interaction: CommandInteraction) => {
+    try {
+      if (!interaction.guildId) throw Error("Não foi encontrado o servidor!");
+
+      // Buscar a queue
+      const queue = useQueue(interaction.guildId);
+
+      if (isEmpty(queue)) throw Error("Não tem nenhuma faixa sendo executado!");
+
+      // Track atual
+      const { currentTrack } = queue;
+
+      // Montagem embed
+      const embed = new EmbedBuilder({
+        description: `O vídeo [${currentTrack?.title}](${currentTrack?.url}) foi pulado!`,
+      });
+
+      // Pular a track
+      queue?.node.skip();
+
+      // Alterar a Resposta
+      await interaction.editReply({
+        embeds: [embed.data],
+      });
+    } catch (error) {
+      await interaction.editReply({
+        content: (error as Error).message,
+      });
+    }
+  },
 };
 
 const pause: CommandService = {
