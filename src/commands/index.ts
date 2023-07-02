@@ -1,3 +1,8 @@
-import ping from "./ping";
+import { CommandService } from "../dtos/CommandDTO";
 
-export default [ping];
+import ping from "./ping";
+import player from "./player";
+
+const commands: CommandService[] = [...player, ping];
+
+export default commands;

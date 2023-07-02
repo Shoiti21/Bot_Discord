@@ -10,6 +10,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@types/lodash": "^4.14.195",
     "concurrently": "^8.2.0",
     "nodemon": "^2.0.22",
     "ts-node": "^10.9.1",
@@ -17,7 +18,12 @@
   },
   "dependencies": {
     "@discordjs/builders": "^1.6.3",
-    "@discordjs/core": "^0.6.0",
-    "dotenv": "^16.3.1"
+    "@discordjs/opus": "^0.9.0",
+    "@discordjs/rest": "^1.7.1",
+    "@discordjs/voice": "^0.16.0",
+    "discord-player": "^6.6.0",
+    "discord.js": "^14.11.0",
+    "dotenv": "^16.3.1",
+    "lodash": "^4.17.21"
   }
 }
