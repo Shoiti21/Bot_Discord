@@ -1,13 +1,22 @@
+import express from "express";
 import { Client, GatewayIntentBits, Events, Routes } from "discord.js";
 import { REST } from "@discordjs/rest";
-import commands from "./commands";
 import { Player } from "discord-player";
+import commands from "./commands";
 require("dotenv").config();
 
 // Variáveis de ambiente.
+const PORT = process.env.PORT || "";
 const TOKEN = process.env.TOKEN || "";
 const CLIENT_ID = process.env.CLIENT_ID || "";
 const GUILD_ID = process.env.GUILD_ID || "";
+
+// Somente para ter endpoint para "pingar"
+const app = express();
+app.get("/", (req, res) => {
+  res.sendStatus(200);
+});
+app.listen(PORT);
 
 // Crie gerenciadores REST
 const rest = new REST({ version: "10" }).setToken(TOKEN);
@@ -33,7 +42,7 @@ client.once(Events.ClientReady, async (c) => {
   });
   // Este método carregará todos os extractors do pacote @discord-player/extractor
   await player.extractors.loadDefault();
-  console.log(`Pronto! Logado no ${c.user.tag}`);
+  console.log(`Pronto! Logadoo no ${c.user.tag}`);
 });
 
 // Eventos de interactions
