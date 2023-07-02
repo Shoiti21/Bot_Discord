@@ -115,7 +115,7 @@ const stop: CommandService = {
 
       // Montagem embed
       const embed = new EmbedBuilder({
-        description: "**Parou a reprodução das faixas!**",
+        description: "**A reprodução das faixas parou!**",
       });
 
       // Alterar a Resposta
@@ -187,7 +187,7 @@ const pause: CommandService = {
 
       // Montagem embed
       const embed = new EmbedBuilder({
-        description: "**Pausou a reprodução das faixas!**",
+        description: "**A reprodução das faixas pausou!**",
       });
 
       // Alterar a Resposta
@@ -207,7 +207,33 @@ const resume: CommandService = {
     .setName("resume")
     .setDescription("Retornar a reprodução")
     .toJSON(),
-  service: async (interaction: CommandInteraction) => {},
+  service: async (interaction: CommandInteraction) => {
+    try {
+      if (!interaction.guildId) throw Error("Não foi encontrado o servidor!");
+
+      // Buscar a queue
+      const queue = useQueue(interaction.guildId);
+
+      if (isEmpty(queue)) throw Error("Não tem nenhuma faixa sendo executado!");
+
+      // Voltar o player
+      queue.node.resume();
+
+      // Montagem embed
+      const embed = new EmbedBuilder({
+        description: "**A reprodução das faixas voltou!**",
+      });
+
+      // Alterar a Resposta
+      await interaction.editReply({
+        embeds: [embed.data],
+      });
+    } catch (error) {
+      await interaction.editReply({
+        content: (error as Error).message,
+      });
+    }
+  },
 };
 
 export default [play, stop, skip, pause, resume];
